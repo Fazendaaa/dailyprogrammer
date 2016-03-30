@@ -27,37 +27,41 @@ type President
     death_year::Integer
 end
 
-data = readtable( "presidents.csv", header=true )
-( n_rows, n_cols ) = size( data )
-all_presidents = President[]
+function main( )
+    local data = readtable( "presidents.csv", header=true )
+    local n_rows::Integer = n_cols::Integer = time::Integer = count::Integer = index::Integer = 0
+    local all_presidents = President[]
 
-for i in 1:n_rows
-    birth_year::Integer = parse( Int,( match( r"\d{4}", data[ i, 2 ] ) ).match )
-    death_year::Integer = ( !is( data[ i, 4 ], NA ) ) ? parse( Int,( match( r"\d{4}", data[ i, 4 ] ) ).match ) : 0
-    push!( all_presidents, President( birth_year, death_year ) )
-end
+    ( n_rows, n_cols ) = size( data )
 
-isless( p1::President, p2::President ) = ( p1.birth_year < p2.birth_year )
-sort!( all_presidents, lt=isless )
+    for i in 1:n_rows
+        birth_year::Integer = parse( Int,( match( r"\d{4}", data[ i, 2 ] ) ).match )
+        death_year::Integer = ( !is( data[ i, 4 ], NA ) ) ? parse( Int,( match( r"\d{4}", data[ i, 4 ] ) ).match ) : 0
+        push!( all_presidents, President( birth_year, death_year ) )
+    end
 
-time = count = index = 0
-for i in 1:length( all_presidents )-1
-    pivot = all_presidents[ i ]
+    isless( p1::President, p2::President ) = ( p1.birth_year < p2.birth_year )
+    sort!( all_presidents, lt=isless )
+    for i in 1:length( all_presidents )-1
+        pivot::President = all_presidents[ i ]
 
-    for j in i+1:length( all_presidents )
-        if all_presidents[ j ].birth_year > pivot.death_year
-            break
-        else
-            count::Integer += 1
+        for j in i+1:length( all_presidents )
+            if all_presidents[ j ].birth_year > pivot.death_year
+                break
+            else
+                count += 1
+            end
         end
+
+        if count > time
+            time = count
+            index = i
+        end
+
+        count = 0
     end
 
-    if count > time
-        time = count
-        index::Integer = i
-    end
-
-    count = 0
+    println( all_presidents[ index+time ].birth_year )
 end
 
-println( all_presidents[ index+time ].birth_year )
+main( )

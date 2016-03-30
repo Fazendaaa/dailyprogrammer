@@ -93,23 +93,26 @@ Have a cool problem that you would like to challenge others to solve? Come by
 ( source: https://redd.it/46zm8m )
 =#
 
-n = x = y = sum = 0
-x::Integer = y::Integer = sum::Integer = 0
-n::Integer = parse(Int,chomp(readline(STDIN)))
-arr = zeros(n)
+function main( )
+    x::Integer = y::Integer = sum::Integer = 0
+    n::Integer = parse( Int, chomp( readline( STDIN ) ) )
+    arr::Array = zeros( n )
 
-@time while !eof(STDIN)
-    (tmp_x, tmp_y) = sort(split(chomp(readline(STDIN))))
-    x = parse(Int,tmp_x) + 1
-    y = parse(Int,tmp_y) + 1
+    @time while !eof( STDIN )
+        ( tmp_x, tmp_y ) = sort( split( chomp( readline( STDIN ) ) ) )
+        x = parse( Int , tmp_x ) + 1
+        y = parse( Int , tmp_y ) + 1
 
-    for i in x:y
-        arr[i] = ( 0 == arr[i] ) ? 1 : 0
+        for i in x:y
+            arr[ i ] = ( 0 == arr[ i ] ) ? 1 : 0
+        end
     end
+
+    for i in 1:n
+        sum += arr[ i ]
+    end
+
+    println( sum )
 end
 
-for i in 1:n
-    sum += arr[i]
-end
-
-println(sum)
+main( )
