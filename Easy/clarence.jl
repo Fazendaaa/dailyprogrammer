@@ -60,6 +60,8 @@ This challenge was suggested by /u/katyai. If you have any challenge ideas pleas
 share them on /r/dailyprogrammer_ideas and there's a good chance we'll use them!
 
 ( source: https://redd.it/4bc3el )
+
+The version of the user Gobbedyret was so simple -- and good -- that inspired me
 =#
 
 function keyboard_distance( key_1::Char, key_2::Char )
@@ -76,13 +78,7 @@ end
 
 function main( )
     input::AbstractString = chomp( readline( STDIN ) )
-    output::Float64 = 0
-
-    for i in 1:length( input )-1
-        output += keyboard_distance( input[ i ], input[ i + 1 ] )
-    end
-
-    @printf( "%.2f cm\n", output )
+    @printf( "%.2f cm\n", sum( [ keyboard_distance( i, j ) for ( i, j ) in zip( input[1:end], input[2:end] ) ] ) )
 end
 
 main( )
