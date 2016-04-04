@@ -78,7 +78,7 @@ end
 
 function main( )
     input::AbstractString = chomp( readline( STDIN ) )
-    @printf( "%.2fcm\n", sum( [ keyboard_distance( i, j ) for ( i, j ) in zip( input[1:end], input[2:end] ) ] ) )
+    @printf( "%.2fcm\n", sum( [ keyboard_distance( i, j ) for ( i, j ) in zip( input[1:end-1], input[2:end] ) ] ) )
 end
 
 main( )
