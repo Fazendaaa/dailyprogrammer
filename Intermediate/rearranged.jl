@@ -48,7 +48,7 @@ challenge input grids as you can, along with your code.
 ( source: https://redd.it/4dmm44 )
 =#
 
-#   exit at EOF
+#   exit at EOF ( in Linux: Ctrl + D and Windows: Ctrl + Z )
 read_matrix( data::DataType=Any, input::IO=STDIN, spacing::Char=' ' ) = readdlm(
 input, spacing, data, header=false, skipblanks=true, ignore_invalid_chars=true,
 quotes=false, comments=false )
@@ -56,11 +56,17 @@ quotes=false, comments=false )
 magic_N( N::Int ) = convert( Int, N*( N^2+1 )/2 )
 
 function swap_grid_line!( grid::Matrix{ Int }, i::Integer, j::Integer )
+    #   @inbounds allows the operation without bounding checking -- great time
+    #   saving
     @inbounds for k in 1:size( grid, 2 )
         grid[ i, k ], grid[ j, k ] = grid[ j, k ], grid[ i, k ]
     end
 end
 
+#=
+    This function basically does the interpolation of a determinated line and see
+    all the combinations, if the combination is valid or not
+=#
 function __magic_square!( grid::Matrix{ Int }, index::Int, magic::Int )
     for i in 1:size( grid, 1 ), j in 1:size( grid, 1 )
         if i != index && j != index
@@ -74,6 +80,11 @@ function __magic_square!( grid::Matrix{ Int }, index::Int, magic::Int )
     end
 end
 
+#=
+    This function call __magic_square! each time with each line of the grid too
+    check up all the combinations -- when the solutions is found returns the
+    the grid
+=#
 function magic_square!( grid::Matrix{ Int } )
     local magic::Int = magic_N( size( grid, 1 ) )
 
