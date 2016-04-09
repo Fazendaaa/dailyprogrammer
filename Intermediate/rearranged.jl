@@ -53,42 +53,24 @@ read_matrix( data::DataType=Any, input::IO=STDIN, spacing::Char=' ' ) = readdlm(
 input, spacing, data, header=false, skipblanks=true, ignore_invalid_chars=true,
 quotes=false, comments=false )
 
-magic_N( N::Int ) = convert( Int, N*( N^2 + 1 )/2 )
+magic_N( N::Int ) = convert( Int, N*( N^2+1 )/2 )
 
-function copy_grid_line!( grid::Matrix{ Int }, src::Integer, dst::Integer )
+function swap_grid_line!( grid::Matrix{ Int }, i::Integer, j::Integer )
     @inbounds for k in 1:size( grid, 2 )
-        grid[ dst, k ] = grid[ src, k ]
-    end
-end
-
-function swap_grid!( grid::Matrix{ Int }, index::Int )
-    local tmp::Array{ Int, 1 } = Array( Int, 1 )
-    local N::Int = size( grid, 2 )
-
-    tmp = ( N != index ) ? deepcopy( vec( grid[ N, : ] ) ):
-                           deepcopy( vec( grid[ N - 1, : ] ) )
-
-    for i in N-1:-1:1
-        if i != index
-            i+1 != index ? copy_grid_line!( grid, i, i+1 ):
-                           copy_grid_line!( grid, i, i+2 )
-        else
-            if 1 == i
-                grid[ 2, : ] = deepcopy( tmp )
-            else
-                copy_grid_line!( grid, i-1, i+1 )
-            end
-        end
-    end
-
-    if 1 != index
-        grid[ 1, : ] = deepcopy( tmp )
+        grid[ i, k ], grid[ j, k ] = grid[ j, k ], grid[ i, k ]
     end
 end
 
 function __magic_square!( grid::Matrix{ Int }, index::Int, magic::Int )
-    for _ in 1:size( grid, 1 )
-        trace( grid ) == magic ? break : swap_grid!( grid, index )
+    for i in 1:size( grid, 1 ), j in 1:size( grid, 1 )
+        if i != index && j != index
+            swap_grid_line!( grid, i, j )
+            if trace( grid ) == magic
+                break
+            end
+        else
+            continue
+        end
     end
 end
 
