@@ -44,13 +44,56 @@ Hint: it's okay for this function to call your function from the main challenge.
 This bonus can also be combined with optional bonus 1. (i.e. verify larger magic
 squares that are missing their bottom row.)
 
-(source: https://redd.it/4dccix)
+( source: https://redd.it/4dccix )
 =#
 
-function verify_magic_square( grid::Array{ Int } )
-    value::Bool = false
-    n::Integer = Int( sqrt( length( grid ) ) )
-    line::Integer = column::Integer = 0
+read_matrix( data::DataType=Any, input::IO=STDIN, spacing::Char=' ' ) = readdlm(
+input, spacing, data, header=false, skipblanks=true, ignore_invalid_chars=true,
+quotes=false, comments=false )
+
+function pseudo_magic_square( grid::Matrix{ Int } )
+    local value::Bool = loop::Bool = false
+    local missing::Int = tmp::Int = 0
+    local last::Array{ Int, 1 } = Array( Int, 1 )
+
+    for i in 1:size( grid, 2 )
+        column = sum( grid[ :, i ] )
+        missing = 15 - column
+        push!( last, missing )
+
+        if 9 >= missing
+            for j in 1:size( grid, 1 ), k in 1:size( grid, 2 )
+                if grid[ j, k ] == missing
+                    loop = true
+                    break
+                end
+            end
+        else
+            loop = true
+        end
+
+        if true == loop
+            break
+        end
+    end
+
+    if false == loop
+        for i in 1:2
+            tmp += grid[ i,i ]
+        end
+        tmp += last[ 4 ]
+        if 15 == tmp
+            value = true
+        end
+    end
+
+    return value
+end
+
+function verify_magic_square( grid::Matrix{ Int } )
+    local value::Bool = false
+    local n::Integer = Int( sqrt( length( grid ) ) )
+    local line::Integer = column::Integer = 0
 
     if 15 == trace( grid )  #   sums the value of the principal diagonal
         for i in 1:n
@@ -68,9 +111,19 @@ function verify_magic_square( grid::Array{ Int } )
 end
 
 function main( )
-    input::Array = [ parse( Int, i ) for i in split( chomp( readline( STDIN ) ), ',' ) ]
-    dim::Integer = Int( sqrt( length( input ) ) )
-    println( verify_magic_square( reshape( input, dim, dim ) ) )
+    local bonus::AbstractString = " "
+    local input::Array{ Int } = Array( Int )
+    local dim::Integer = 0
+
+    println( "Is any row missing? [Y/N]" )
+    bonus = chomp( readline( STDIN ) )
+    input = read_matrix( Int )
+
+    if "Y" == bonus
+        println( @time pseudo_magic_square( input ) )
+    else
+        #println( @time verify_magic_square( reshape( input, dim, dim ) ) )
+    end
 end
 
 main( )
