@@ -54,7 +54,7 @@ quotes=false, comments=false )
 function pseudo_magic_square( grid::Matrix{ Int } )
     local value::Bool = loop::Bool = false
     local missing::Int = tmp::Int = 0
-    local last::Array{ Int, 1 } = Array( Int, 1 )
+    local last::Array{ Int, 1 } = Int[]
 
     for i in 1:size( grid, 2 )
         column = sum( grid[ :, i ] )
@@ -81,7 +81,7 @@ function pseudo_magic_square( grid::Matrix{ Int } )
         for i in 1:2
             tmp += grid[ i,i ]
         end
-        tmp += last[ 4 ]
+        tmp += last[ 3 ]
         if 15 == tmp
             value = true
         end
@@ -92,16 +92,15 @@ end
 
 function verify_magic_square( grid::Matrix{ Int } )
     local value::Bool = false
-    local n::Integer = Int( sqrt( length( grid ) ) )
     local line::Integer = column::Integer = 0
 
     if 15 == trace( grid )  #   sums the value of the principal diagonal
-        for i in 1:n
+        for i in 1:size( grid, 1 )
             line = sum( grid[ i, : ] )
             column = sum( grid[ :, i ] )
             if line != 15 || column != 15
                 break
-            elseif n == i   #   if is the last verification and it's valid
+            elseif size( grid, 1 ) == i   #   if is the last verification and it's valid
                 value = true
             end
         end
@@ -110,20 +109,19 @@ function verify_magic_square( grid::Matrix{ Int } )
     return value
 end
 
+#=
+    I've modified the input format. So, that only be possibles input like:
+
+        8 1 6                       8 1 6
+        3 5 7           or          3 5 7
+        4 9 2
+=#
 function main( )
-    local bonus::AbstractString = " "
-    local input::Array{ Int } = Array( Int )
-    local dim::Integer = 0
+    local input::Matrix{ Int } = read_matrix( Int )
 
-    println( "Is any row missing? [Y/N]" )
-    bonus = chomp( readline( STDIN ) )
-    input = read_matrix( Int )
-
-    if "Y" == bonus
-        println( @time pseudo_magic_square( input ) )
-    else
-        #println( @time verify_magic_square( reshape( input, dim, dim ) ) )
-    end
+    println( @time ( size( input, 1 ) == size( input, 2 ) ) ?
+                     verify_magic_square( input ):
+                     pseudo_magic_square( input ) )
 end
 
 main( )
