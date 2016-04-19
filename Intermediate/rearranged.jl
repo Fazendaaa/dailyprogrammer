@@ -67,21 +67,15 @@ end
     This function basically does the interpolation of a determinated line and see
     all the combinations, if the combination is valid or not
 =#
-function __magic_square!( grid::Matrix{ Int }, magic::Int, index::Int=1 )
-    if index + 1 >= size( grid, 1 )
-        return grid
-    else
-        for p in __magic_square!( grid, magic, index+1 )
-            produce( p )
-            return p
-        end
-
-        for i in index+1:size( grid, 1 )
-            swap_grid_line!( grid, index, i )
-            for p in __magic_square!( grid, magic, index+1 )
-                produce( p )
+function __magic_square!( grid::Matrix{ Int }, index::Int, magic::Int )
+    for i in 1:size( grid, 1 ), j in 1:size( grid, 1 )
+        if i != index && j != index
+            swap_grid_line!( grid, i, j )
+            if trace( grid ) == magic
+                break
+            else
+                continue
             end
-            swap_grid_line!( grid, index, i )
         end
     end
 end
@@ -93,13 +87,9 @@ end
 =#
 function magic_square!( grid::Matrix{ Int } )
     local magic::Int = magic_N( size( grid, 1 ) )
-    local counter::Int = 1
 
     for i in 1:size( grid, 1 )
-        task = @task __magic_square!( grid, magic, i )
-        for n in task
-            nothing
-        end
+        trace( grid ) == magic ? break : __magic_square!( grid, i, magic )
     end
 
     return grid
