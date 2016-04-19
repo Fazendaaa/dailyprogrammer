@@ -71,11 +71,7 @@ function __magic_square!( grid::Matrix{ Int }, index::Int, magic::Int )
     for i in 1:size( grid, 1 ), j in 1:size( grid, 1 )
         if i != index && j != index
             swap_grid_line!( grid, i, j )
-            if trace( grid ) == magic
-                break
-            else
-                continue
-            end
+            trace( grid ) == magic ? break : continue
         end
     end
 end
